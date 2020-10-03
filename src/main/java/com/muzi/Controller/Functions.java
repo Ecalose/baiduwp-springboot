@@ -1,7 +1,6 @@
 package com.muzi.Controller;
 
 import com.alibaba.fastjson.JSONObject;
-import net.sf.json.JSONArray;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -18,11 +17,12 @@ import java.util.regex.Pattern;
 public class Functions {
     static String surl = "1bBH9G3Q5M-7UV-bhvQ_dsg";//分享链接/s/后的一部分
     static String pwd = "bazh";//提取码
-    static String BUDSS = "";//记得填哦
-    static String STOKEN = "";
+    static String BUDSS = "";//记得填,只填BUDSS就行
+    //static String STOKEN = "";
     static String dlink;
 
     static int numberOfDocuments=1;
+    static List<String> finalLinks = new ArrayList<>();
 
     public static void main(String[] args) {
         try {
@@ -53,10 +53,15 @@ public class Functions {
         System.out.println("提取文件状态:" + errno_id);
         System.out.println("当前randsk:" + randsk);
         if (errno_id != 0) {
-            return "0";
+            return "提取出错";
+        }else
+        if (finalLinks.size()==numberOfDocuments){
+            System.out.println(finalLinks);
+            return String.valueOf(finalLinks);
+        }else{
+            getSign(surl, randsk);
         }
-        getSign(surl, randsk);
-        return randsk;
+        return String.valueOf(finalLinks);
     }
 
     public static String getSign(String surl, String randsk) throws IOException {
@@ -180,7 +185,7 @@ public class Functions {
                 .data("type", "nolimit")
                 .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.514.1919.810 Safari/537.36")
                 .cookie("BDUSS", BUDSS)
-                .cookie("STOKEN", STOKEN)
+                //.cookie("STOKEN", STOKEN)
                 .cookie("BDCLND", randsk)
                 .header("Referer", "https://pan.baidu.com/disk/home")
                 .post();
@@ -208,6 +213,12 @@ public class Functions {
                 .cookie("BDUSS", BUDSS)
                 .execute();
         System.out.println("第"+numberOfDocuments+"个文件"+"得到真实地址：" + response.url());
-        return "1";
+        String finalLink= String.valueOf(response.url());
+        finalLinks.add("第"+numberOfDocuments+"个文件"+"得到真实地址："+finalLink+"\n");
+        if (finalLinks.size()==numberOfDocuments){
+            System.out.println(finalLinks);
+            return String.valueOf(finalLinks);
+        }
+        return "出错了";
     }
 }
