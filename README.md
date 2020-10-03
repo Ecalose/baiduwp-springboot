@@ -7,9 +7,9 @@
 
 讲真java做这个比php麻烦很多。
 
-目前只写了单文件。
-
 记得更新pom文件。
+
+【2020.10.03新增】可以批量提取多文件的链接了，暂不支持文件夹。
 
 thanks：
 [baiduwp-php](https://github.com/yuantuo666/baiduwp-php)
