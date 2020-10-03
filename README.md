@@ -8,7 +8,10 @@
 讲真java做这个比php麻烦很多。
 
 记得更新pom文件。
+
+
 #使用方法
+
 1.启动Springboot类
 
 2.访问接口localhost:8080/checkin
