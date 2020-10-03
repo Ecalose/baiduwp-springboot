@@ -16,8 +16,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Functions {
-    static String surl = "1bBH9G3Q5M-7UV-bhvQ_dsg";//分享链接/s/后的一部分
-    static String pwd = "bazh";//提取码
+    static String surl = "";//分享链接/s/后的一部分
+    static String pwd = "";//提取码
     static String BUDSS = "";//记得填哦
     static String STOKEN = "";
     static String dlink;
@@ -102,9 +102,6 @@ public class Functions {
             String fsBracesCount = fs.substring(i, i + 1);
             if (fsBracesCount.equals("{")) {
                 bracesCount++;
-                if(bracesCount==6){
-                    bracesCount--;
-                }
             }
         }
         System.out.println("一共识别出了" + bracesCount + "个文件");
