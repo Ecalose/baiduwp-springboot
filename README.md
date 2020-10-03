@@ -8,7 +8,10 @@
 讲真java做这个比php麻烦很多。
 
 记得更新pom文件。
-#使用方法
+
+
+# 使用方法
+
 1.启动Springboot类
 
 2.访问接口localhost:8080/checkin
@@ -24,5 +27,5 @@
 
 【2020.10.03新增】对接了Springboot，可以扩展接口业务了。
 
-thanks：
+Thanks：
 [baiduwp-php](https://github.com/yuantuo666/baiduwp-php)
