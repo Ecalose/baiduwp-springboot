@@ -1,6 +1,7 @@
 package com.muzi.Controller;
 
 import com.alibaba.fastjson.JSONObject;
+import net.sf.json.JSONArray;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -9,17 +10,19 @@ import org.jsoup.nodes.Element;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Functions {
-    static String surl = "1uw8r4k8tnowEx2EuSKhyiw";//分享链接/s/后的一部分
-    static String pwd = "0f75";//提取码
-    static String BUDSS="";//记得填哦
-    static String STOKEN="";
-
+    static String surl = "";//分享链接/s/后的一部分
+    static String pwd = "";//提取码
+    static String BUDSS = "";//记得填哦
+    static String STOKEN = "";
     static String dlink;
+
+    static int numberOfDocuments=1;
 
     public static void main(String[] args) {
         try {
@@ -78,7 +81,8 @@ public class Functions {
             System.out.println("找到文件信息: " + m.group(0));
         }
         String jsonStr = m.group(0).substring(15);
-        String jsonStrs = jsonStr.substring(jsonStr.indexOf("(") + 1, jsonStr.indexOf(")"));
+        String jsonStrs = jsonStr.substring(jsonStr.indexOf("{"), jsonStr.lastIndexOf('}') + 1);
+        System.out.println("解析到的yunData的json数据：" + jsonStrs);
         JSONObject jsonStrss = JSONObject.parseObject(jsonStrs);
 
         System.out.println(jsonStrss);
@@ -91,23 +95,58 @@ public class Functions {
         JSONObject A1 = jsonStrss.getJSONObject("file_list");
         List<Object> A2 = A1.getJSONArray("list");
         String A2s = String.valueOf(A2);
-        String fs = A2s.substring(A2s.indexOf("[") + 1, A2s.indexOf("]"));
-        JSONObject A3 = JSONObject.parseObject(fs);
-        String fs_id = A3.getString("fs_id");
+        String fs = A2s.substring(A2s.indexOf("[") + 1, A2s.lastIndexOf("]"));
+        //遍历识别有几个文件
+        int bracesCount = 0;
+        for (int i = 0; i < fs.length(); i++) {
+            String fsBracesCount = fs.substring(i, i + 1);
+            if (fsBracesCount.equals("{")) {
+                bracesCount++;
+            }
+        }
+        System.out.println("一共识别出了" + bracesCount + "个文件");
+        int files = 0;
+        String[] splitJson = fs.split(",\\{");
+        List<String> fsList = new ArrayList<>();
+        int fsListCount=0;
+        for (int i = 0; i < fs.length(); i++) {
+            for (int count = 1; count <= bracesCount; count++) {
+                if (files == bracesCount) {
+                    break;
+                }
+                System.out.println("第" + count + "个文件" + splitJson[files]);
+                if (splitJson[files].startsWith("{")) {
+                    System.out.println("有{");
+                } else {
+                    System.out.println("没{");
+                    splitJson[files]="{"+splitJson[files];
+                }
+                fsList.add(splitJson[files]);
+                System.out.println("获取到的文件集合" + fsList);
+                fsListCount++;
+                files++;
+            }
+        }
 
-        System.out.println(A1);
-        System.out.println(A2);
-        System.out.println("A2s=" + A2s);
-        System.out.println(A3);
-        System.out.println(fs_id);
+        System.out.println("解析到的文件集合：" + fs);
+        for (int i = 0; i < fsListCount; i++){
+            JSONObject A3 = JSONObject.parseObject(fsList.get(i));
+            String fs_id = A3.getString("fs_id");
 
-        System.out.println("当前获取sign：" + sign);
-        System.out.println("当前获取timestamp：" + timestamp);
-        System.out.println("当前获取shareid：" + shareid);
-        System.out.println("当前获取uk：" + uk);
-        System.out.println("当前获取fs_id：" + fs_id);
+            System.out.println(A1);
+            System.out.println(A2);
+            System.out.println("A2s=" + A2s);
+            System.out.println(A3);
+            System.out.println(fs_id);
 
-        getLink(fs_id, timestamp, sign, randsk, shareid, uk);
+            System.out.println("当前获取sign：" + sign);
+            System.out.println("当前获取timestamp：" + timestamp);
+            System.out.println("当前获取shareid：" + shareid);
+            System.out.println("当前获取uk：" + uk);
+            System.out.println("当前获取fs_id：" + fs_id);
+            getLink(fs_id, timestamp, sign, randsk, shareid, uk);
+            numberOfDocuments++;
+        }
         return "1";
     }
 
@@ -147,11 +186,11 @@ public class Functions {
         System.out.println("得到的json:" + jsonStr);
         List<Object> A2 = jsonStr.getJSONArray("list");
         String A2s = String.valueOf(A2);
-        String fs = A2s.substring(A2s.indexOf("[") + 1, A2s.lastIndexOf( ']' ));
+        String fs = A2s.substring(A2s.indexOf("[") + 1, A2s.lastIndexOf(']'));
         System.out.println(fs);
         JSONObject A3 = JSONObject.parseObject(fs);
         dlink = A3.getString("dlink");
-        System.out.println("得到的pcs地址:"+dlink);
+        System.out.println("得到的pcs地址:" + dlink);
         getReal();
         return "1";
     }
@@ -165,7 +204,7 @@ public class Functions {
                 .header("User-Agent", "LogStatistic")
                 .cookie("BDUSS", BUDSS)
                 .execute();
-        System.out.println("得到真实地址："+response.url());
+        System.out.println("第"+numberOfDocuments+"个文件"+"得到真实地址：" + response.url());
         return "1";
     }
 }
