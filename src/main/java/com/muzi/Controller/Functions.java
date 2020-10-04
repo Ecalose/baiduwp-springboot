@@ -15,13 +15,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Functions {
-    static String surl = "1bBH9G3Q5M-7UV-bhvQ_dsg";//分享链接/s/后的一部分
-    static String pwd = "bazh";//提取码
+    static String surl = "";//分享链接/s/后的一部分
+    static String pwd = "";//提取码
     static String BUDSS = "";//记得填,只填BUDSS就行
     //static String STOKEN = "";
     static String dlink;
 
-    static int numberOfDocuments=1;
+    static int numberOfDocuments = 1;
     static List<String> finalLinks = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -54,14 +54,13 @@ public class Functions {
         System.out.println("当前randsk:" + randsk);
         if (errno_id != 0) {
             return "提取出错";
-        }else
-        if (finalLinks.size()==numberOfDocuments){
+        } else if (finalLinks.size() == numberOfDocuments) {
             System.out.println(finalLinks);
             return String.valueOf(finalLinks);
-        }else{
+        } else {
             getSign(surl, randsk);
         }
-        return String.valueOf(finalLinks);
+        return "1";
     }
 
     public static String getSign(String surl, String randsk) throws IOException {
@@ -101,22 +100,20 @@ public class Functions {
         List<Object> A2 = A1.getJSONArray("list");
         String A2s = String.valueOf(A2);
         String fs = A2s.substring(A2s.indexOf("[") + 1, A2s.lastIndexOf("]"));
+        System.out.println("当前识别文件json信息集合：" + fs);
+
         //遍历识别有几个文件
-        int bracesCount = 0;
-        for (int i = 0; i < fs.length(); i++) {
-            String fsBracesCount = fs.substring(i, i + 1);
-            if (fsBracesCount.equals("{")) {
-                bracesCount++;
-                if(bracesCount==6){
-                    bracesCount--;
-                }
-            }
-        }
+        int bracesCount;
+        int len = fs.length();//优化后的文件识别方式
+        String fs2 = fs.replaceAll("\"path\"", "");
+        int len2 = fs2.length();
+        bracesCount = (len - len2) / 6;
+
         System.out.println("一共识别出了" + bracesCount + "个文件");
         int files = 0;
         String[] splitJson = fs.split(",\\{");
         List<String> fsList = new ArrayList<>();
-        int fsListCount=0;
+        int fsListCount = 0;
         for (int i = 0; i < fs.length(); i++) {
             for (int count = 1; count <= bracesCount; count++) {
                 if (files == bracesCount) {
@@ -127,7 +124,7 @@ public class Functions {
                     System.out.println("有{");
                 } else {
                     System.out.println("没{");
-                    splitJson[files]="{"+splitJson[files];
+                    splitJson[files] = "{" + splitJson[files];
                 }
                 fsList.add(splitJson[files]);
                 System.out.println("获取到的文件集合" + fsList);
@@ -137,7 +134,7 @@ public class Functions {
         }
 
         System.out.println("解析到的文件集合：" + fs);
-        for (int i = 0; i < fsListCount; i++){
+        for (int i = 0; i < fsListCount; i++) {
             JSONObject A3 = JSONObject.parseObject(fsList.get(i));
             String fs_id = A3.getString("fs_id");
 
@@ -212,13 +209,26 @@ public class Functions {
                 .header("User-Agent", "LogStatistic")
                 .cookie("BDUSS", BUDSS)
                 .execute();
-        System.out.println("第"+numberOfDocuments+"个文件"+"得到真实地址：" + response.url());
-        String finalLink= String.valueOf(response.url());
-        finalLinks.add("第"+numberOfDocuments+"个文件"+"得到真实地址："+finalLink+"\n");
-        if (finalLinks.size()==numberOfDocuments){
+        System.out.println("第" + numberOfDocuments + "个文件" + "得到真实地址：" + response.url());
+        String finalLink = String.valueOf(response.url());
+        finalLinks.add("第" + numberOfDocuments + "个文件" + "得到真实地址：" + finalLink + "\n");
+        if (finalLinks.size() == numberOfDocuments) {
             System.out.println(finalLinks);
             return String.valueOf(finalLinks);
         }
         return "出错了";
+    }
+
+    public static String retunReal4json() throws IOException {
+        String url = dlink;
+        Connection.Response response = Jsoup
+                .connect(url)
+                .ignoreContentType(true)
+                .followRedirects(true)
+                .header("User-Agent", "LogStatistic")
+                .cookie("BDUSS", BUDSS)
+                .execute();
+        System.out.println("第" + numberOfDocuments + "个文件" + "得到真实地址：" + response.url());
+        return "1";
     }
 }
